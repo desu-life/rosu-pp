@@ -166,6 +166,8 @@ mod tests {
                 break;
             };
 
+            state.slider_tick_misses = next_gradual.difficulty.n_slider_ticks;
+            
             if i % 2 == 0 {
                 let next_gradual_2nd = gradual_2nd.nth(state, 1).unwrap();
                 assert_eq!(next_gradual, next_gradual_2nd);

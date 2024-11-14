@@ -23,7 +23,7 @@ use super::{
         difficulty_point_at, effect_point_at, timing_point_at, DifficultyPoint, EffectPoint,
         TimingPoint,
     },
-    hit_object::HitObject,
+    hit_object::{hit_object_at, HitObject},
     mode::{ConvertStatus, IGameMode},
 };
 
@@ -103,18 +103,23 @@ impl Beatmap {
     }
 
     /// Finds the [`TimingPoint`] that is active at the given time.
-    pub(crate) fn timing_point_at(&self, time: f64) -> Option<&TimingPoint> {
+    pub fn timing_point_at(&self, time: f64) -> Option<&TimingPoint> {
         timing_point_at(&self.timing_points, time)
     }
 
     /// Finds the [`DifficultyPoint`] that is active at the given time.
-    pub(crate) fn difficulty_point_at(&self, time: f64) -> Option<&DifficultyPoint> {
+    pub fn difficulty_point_at(&self, time: f64) -> Option<&DifficultyPoint> {
         difficulty_point_at(&self.difficulty_points, time)
     }
 
     /// Finds the [`EffectPoint`] that is active at the given time.
-    pub(crate) fn effect_point_at(&self, time: f64) -> Option<&EffectPoint> {
+    pub fn effect_point_at(&self, time: f64) -> Option<&EffectPoint> {
         effect_point_at(&self.effect_points, time)
+    }
+
+    /// Finds the [`HitObject`] that is active at the given time.
+    pub fn hit_object_at(&self, time: f64) -> Option<&HitObject> {
+        hit_object_at(&self.hit_objects, time)
     }
 
     /// Sum up the duration of all breaks (in milliseconds).

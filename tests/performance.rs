@@ -107,15 +107,15 @@ fn basic_osu() {
             NM => {
                 pp: 272.6047426867276,
                 pp_acc: 97.62287463107766,
-                pp_aim: 99.3726518686143,
+                pp_aim: 99.37265186861426,
                 pp_flashlight: 0.0,
                 pp_speed: 64.48542022217285,
                 effective_miss_count: 0.0,
             };
             HD => {
-                pp: 299.17174736245374,
+                pp: 299.17174736245363,
                 pp_acc: 105.43270460156388,
-                pp_aim: 110.10489751227146,
+                pp_aim: 110.10489751227142,
                 pp_flashlight: 0.0,
                 pp_speed: 71.4498451141828,
                 effective_miss_count: 0.0,
@@ -147,7 +147,7 @@ fn basic_osu() {
             FL => {
                 pp: 402.408877784248,
                 pp_acc: 99.57533212369923,
-                pp_aim: 99.3726518686143,
+                pp_aim: 99.37265186861426,
                 pp_flashlight: 132.29720631068272,
                 pp_speed: 64.48542022217285,
                 effective_miss_count: 0.0,
@@ -155,7 +155,7 @@ fn basic_osu() {
             HD FL => {
                 pp: 469.3245236137446,
                 pp_acc: 107.54135869359516,
-                pp_aim: 110.10489751227146,
+                pp_aim: 110.10489751227142,
                 pp_flashlight: 171.62594459401154,
                 pp_speed: 71.4498451141828,
                 effective_miss_count: 0.0,

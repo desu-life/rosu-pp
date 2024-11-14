@@ -99,3 +99,11 @@ pub struct Spinner {
 pub struct HoldNote {
     pub duration: f64,
 }
+
+pub fn hit_object_at(objects: &[HitObject], time: f64) -> Option<&HitObject> {
+    let i = objects
+        .binary_search_by(|o| o.start_time.total_cmp(&time))
+        .unwrap_or_else(|i| i.saturating_sub(1));
+
+    objects.get(i)
+}

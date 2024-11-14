@@ -322,7 +322,7 @@ impl<'map> OsuPerformance<'map> {
     pub const fn state(mut self, state: OsuScoreState) -> Self {
         let OsuScoreState {
             max_combo,
-            slider_tick_hits: _,
+            slider_tick_hits,
             slider_tick_misses,
             slider_end_hits,
             n300,
@@ -332,6 +332,7 @@ impl<'map> OsuPerformance<'map> {
         } = state;
 
         self.combo = Some(max_combo);
+        self.slider_tick_hits = Some(slider_tick_hits);
         self.slider_tick_misses = Some(slider_tick_misses);
         self.slider_end_hits = Some(slider_end_hits);
         self.n300 = Some(n300);
