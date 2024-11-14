@@ -8,6 +8,10 @@ pub struct OsuScoreState {
     ///
     /// Only relevant for osu!lazer.
     pub slider_tick_hits: u32,
+    /// Amount of successfully hit slider ticks and repeat.
+    ///
+    /// Only relevant for osu!lazer.
+    pub slider_tick_misses: u32,
     /// Amount of successfully hit slider ends.
     ///
     /// Only relevant for osu!lazer.
@@ -28,6 +32,7 @@ impl OsuScoreState {
         Self {
             max_combo: 0,
             slider_tick_hits: 0,
+            slider_tick_misses: 0,
             slider_end_hits: 0,
             n300: 0,
             n100: 0,

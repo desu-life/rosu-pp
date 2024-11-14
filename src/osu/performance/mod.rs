@@ -29,6 +29,7 @@ pub struct OsuPerformance<'map> {
     pub(crate) acc: Option<f64>,
     pub(crate) combo: Option<u32>,
     pub(crate) slider_tick_hits: Option<u32>,
+    pub(crate) slider_tick_misses: Option<u32>,
     pub(crate) slider_end_hits: Option<u32>,
     pub(crate) n300: Option<u32>,
     pub(crate) n100: Option<u32>,
@@ -176,6 +177,15 @@ impl<'map> OsuPerformance<'map> {
         self
     }
 
+    /// Specify the amount of missed slider ticks.
+    ///
+    /// Only relevant for osu!lazer.
+    pub const fn n_slider_ticks_misses(mut self, n_slider_ticks: u32) -> Self {
+        self.slider_tick_misses = Some(n_slider_ticks);
+
+        self
+    }
+
     /// Specify the amount of hit slider ends.
     ///
     /// Only relevant for osu!lazer.
@@ -312,7 +322,8 @@ impl<'map> OsuPerformance<'map> {
     pub const fn state(mut self, state: OsuScoreState) -> Self {
         let OsuScoreState {
             max_combo,
-            slider_tick_hits,
+            slider_tick_hits: _,
+            slider_tick_misses,
             slider_end_hits,
             n300,
             n100,
@@ -321,7 +332,7 @@ impl<'map> OsuPerformance<'map> {
         } = state;
 
         self.combo = Some(max_combo);
-        self.slider_tick_hits = Some(slider_tick_hits);
+        self.slider_tick_misses = Some(slider_tick_misses);
         self.slider_end_hits = Some(slider_end_hits);
         self.n300 = Some(n300);
         self.n100 = Some(n100);
@@ -371,9 +382,12 @@ impl<'map> OsuPerformance<'map> {
             let n_slider_ends = self
                 .slider_end_hits
                 .map_or(attrs.n_sliders, |n| cmp::min(n, attrs.n_sliders));
-            let n_slider_ticks = self
-                .slider_tick_hits
-                .map_or(attrs.n_slider_ticks, |n| cmp::min(n, attrs.n_slider_ticks));
+            let n_slider_ticks = self.slider_tick_hits.map_or(
+                self.slider_tick_misses.map_or(attrs.n_slider_ticks, |n| {
+                    cmp::min(attrs.n_slider_ticks - n, attrs.n_slider_ticks)
+                }),
+                |n| cmp::min(n, attrs.n_slider_ticks),
+            );
 
             (
                 n_slider_ends,
@@ -595,9 +609,10 @@ impl<'map> OsuPerformance<'map> {
             cmp::min(combo, max_possible_combo)
         });
 
+        let n_slider_tick_misses = max_slider_ticks - n_slider_ticks;
         self.combo = Some(max_combo);
         self.slider_end_hits = Some(n_slider_ends);
-        self.slider_tick_hits = Some(n_slider_ticks);
+        self.slider_tick_misses = Some(n_slider_tick_misses);
         self.n300 = Some(n300);
         self.n100 = Some(n100);
         self.n50 = Some(n50);
@@ -606,6 +621,7 @@ impl<'map> OsuPerformance<'map> {
         OsuScoreState {
             max_combo,
             slider_tick_hits: n_slider_ticks,
+            slider_tick_misses: n_slider_tick_misses,
             slider_end_hits: n_slider_ends,
             n300,
             n100,
@@ -653,8 +669,8 @@ impl<'map> OsuPerformance<'map> {
                 }
 
                 // * Combine regular misses with tick misses since tick misses break combo as well
-                effective_miss_count = effective_miss_count
-                    .min(f64::from(n_slider_tick_miss(&attrs, &state) + state.misses));
+                effective_miss_count =
+                    effective_miss_count.min(f64::from(state.slider_tick_misses + state.misses));
             }
         }
 
@@ -686,6 +702,7 @@ impl<'map> OsuPerformance<'map> {
             acc: None,
             combo: None,
             slider_tick_hits: None,
+            slider_tick_misses: None,
             slider_end_hits: None,
             n300: None,
             n100: None,
@@ -838,8 +855,7 @@ impl OsuPerformanceInner<'_> {
                 // * We add tick misses here since they too mean that the player didn't follow the slider properly
                 // * We however aren't adding misses here because missing slider heads has a harsh penalty by itself and doesn't mean that the rest of the slider wasn't followed properly
                 (f64::from(
-                    n_slider_ends_dropped(&self.attrs, &self.state)
-                        + n_slider_tick_miss(&self.attrs, &self.state),
+                    n_slider_ends_dropped(&self.attrs, &self.state) + self.state.slider_tick_misses,
                 ))
                 .min(estimate_diff_sliders)
             };
@@ -1046,10 +1062,6 @@ const fn n_slider_ends_dropped(attrs: &OsuDifficultyAttributes, state: &OsuScore
     attrs.n_sliders - state.slider_end_hits
 }
 
-const fn n_slider_tick_miss(attrs: &OsuDifficultyAttributes, state: &OsuScoreState) -> u32 {
-    attrs.n_slider_ticks - state.slider_tick_hits
-}
-
 struct NoComboState {
     n300: u32,
     n100: u32,
@@ -1160,6 +1172,7 @@ mod test {
             misses,
             slider_end_hits: n_slider_ends,
             slider_tick_hits: n_slider_ticks,
+            slider_tick_misses: max_slider_ticks - n_slider_ticks,
             ..Default::default()
         };
 
@@ -1331,6 +1344,7 @@ mod test {
         let expected = OsuScoreState {
             max_combo: 500,
             slider_tick_hits: N_SLIDER_TICKS,
+            slider_tick_misses: 0,
             slider_end_hits: N_SLIDERS,
             n300: 300,
             n100: 20,
@@ -1355,6 +1369,7 @@ mod test {
         let expected = OsuScoreState {
             max_combo: 500,
             slider_tick_hits: 0,
+            slider_tick_misses: 0,
             slider_end_hits: 0,
             n300: 300,
             n100: 289,
@@ -1378,6 +1393,7 @@ mod test {
         let expected = OsuScoreState {
             max_combo: 500,
             slider_tick_hits: N_SLIDER_TICKS,
+            slider_tick_misses: 0,
             slider_end_hits: N_SLIDERS,
             n300: 0,
             n100: 589,
@@ -1403,6 +1419,7 @@ mod test {
         let expected = OsuScoreState {
             max_combo: 500,
             slider_tick_hits: 0,
+            slider_tick_misses: 0,
             slider_end_hits: 0,
             n300: 300,
             n100: 50,

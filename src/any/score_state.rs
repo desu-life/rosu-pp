@@ -19,6 +19,10 @@ pub struct ScoreState {
     ///
     /// Only relevant for osu!standard in lazer.
     pub slider_tick_hits: u32,
+    /// Amount of successfully hit slider ticks and repeats.
+    ///
+    /// Only relevant for osu!standard in lazer.
+    pub slider_tick_misses: u32,
     /// Amount of successfully hit slider ends.
     ///
     /// Only relevant for osu!standard in lazer.
@@ -44,6 +48,7 @@ impl ScoreState {
         Self {
             max_combo: 0,
             slider_tick_hits: 0,
+            slider_tick_misses: 0,
             slider_end_hits: 0,
             n_geki: 0,
             n_katu: 0,
@@ -77,6 +82,7 @@ impl From<ScoreState> for OsuScoreState {
         Self {
             max_combo: state.max_combo,
             slider_tick_hits: state.slider_tick_hits,
+            slider_tick_misses: state.slider_tick_misses,
             slider_end_hits: state.slider_end_hits,
             n300: state.n300,
             n100: state.n100,
@@ -128,6 +134,7 @@ impl From<OsuScoreState> for ScoreState {
         Self {
             max_combo: state.max_combo,
             slider_tick_hits: state.slider_tick_hits,
+            slider_tick_misses: state.slider_tick_misses,
             slider_end_hits: state.slider_end_hits,
             n_geki: 0,
             n_katu: 0,
@@ -145,6 +152,7 @@ impl From<TaikoScoreState> for ScoreState {
             max_combo: state.max_combo,
             slider_tick_hits: 0,
             slider_end_hits: 0,
+            slider_tick_misses: 0,
             n_geki: 0,
             n_katu: 0,
             n300: state.n300,
@@ -161,6 +169,7 @@ impl From<CatchScoreState> for ScoreState {
             max_combo: state.max_combo,
             slider_tick_hits: 0,
             slider_end_hits: 0,
+            slider_tick_misses: 0,
             n_geki: 0,
             n_katu: state.tiny_droplet_misses,
             n300: state.fruits,
@@ -177,6 +186,7 @@ impl From<ManiaScoreState> for ScoreState {
             max_combo: 0,
             slider_tick_hits: 0,
             slider_end_hits: 0,
+            slider_tick_misses: 0,
             n_geki: state.n320,
             n_katu: state.n200,
             n300: state.n300,
